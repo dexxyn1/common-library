@@ -1,6 +1,6 @@
 // ResultUtils type for consistent responses
 
-import {formatDateTime} from "./dateUtils";
+import {formatDateTime} from "../date/dateUtils";
 
 type SuccessResult<T> = {success: true, data: T}
 export type  ErrorResult = {success: false, error: StandardError}
