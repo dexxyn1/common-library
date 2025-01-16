@@ -1,6 +1,6 @@
 // ResultUtils type for consistent responses
 
-import {formatDateTime} from "../date/dateUtils";
+import {DateUtils} from "../date/dateUtils";
 
 type SuccessResult<T> = {success: true, data: T}
 export type  ErrorResult = {success: false, error: StandardError}
@@ -42,7 +42,16 @@ export function toErrorResult(name: ErrorName, message: string, details?: Record
             code: code,
             details: details,
             statusCode: statusCode,
-            timestamp: formatDateTime(new Date())
+            timestamp: DateUtils.formatDateTime(new Date())
         } };
 }
 
+
+// Export everything as a single constant object
+const ResultUtils = {
+    toResult,
+    errorToErrorResult,
+    toErrorResult,
+  };
+  
+export { ResultUtils };
