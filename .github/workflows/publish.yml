@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # Specify Node.js version
+          node-version: '20'  # Specify Node.js version
           registry-url: 'https://registry.npmjs.org/'
 
       # Step 3: Install dependencies
