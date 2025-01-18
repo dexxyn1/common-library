@@ -112,3 +112,6 @@ function resolveUrl(template: string, params: unknown): string {
         return String(value);
     });
 }
+
+
+export const ApiClientUtils = {resolveUrl, createApiClient}
