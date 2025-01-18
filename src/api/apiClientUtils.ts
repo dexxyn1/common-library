@@ -20,9 +20,13 @@ export const createApiClient = (basePath: string) => {
     const request = async <T>(
         endpoint: string,
         options: ApiOptions = {},
-        queryParameters: Record<string, string | number | boolean | null | undefined> = {}
+        queryParameters: Record<string, string | number | boolean | null | undefined> = {},
+        pathParameters: Record<string, string> = {} // New parameter for path placeholders
     ): Promise<T> => {
         const { method = 'GET', headers, body } = options;
+
+        // Resolve the URL template with path parameters
+        const resolvedEndpoint = resolveUrl(endpoint, pathParameters);
 
         // Construct query string from queryParameters
         const queryString = new URLSearchParams(
@@ -35,7 +39,7 @@ export const createApiClient = (basePath: string) => {
         ).toString();
 
         // Append query string to endpoint if queryParameters exist
-        const url = queryString ? `${sanitizedBasePath}/${endpoint}?${queryString}` : `${sanitizedBasePath}/${endpoint}`;
+        const url = queryString ? `${sanitizedBasePath}/${resolvedEndpoint}?${queryString}` : `${sanitizedBasePath}/${resolvedEndpoint}`;
         if (method === 'GET' && body) {
             throw new Error('GET requests cannot have a body');
         }
@@ -63,19 +67,39 @@ export const createApiClient = (basePath: string) => {
     };
 
     return {
-        get: <T>(endpoint: string, queryParameters: Record<string, string | number | boolean | null | undefined> = {}): Promise<T> =>
-            request<T>(endpoint, { method: 'GET' }, queryParameters),
+        get: <T>(
+            endpoint: string, 
+            queryParameters: Record<string, string | number | boolean | null | undefined> = {},
+            pathParameters: Record<string, string> = {}): Promise<T> =>
+            request<T>(endpoint, { method: 'GET' }, queryParameters, pathParameters),
 
-        post: <T>(endpoint: string, body?: unknown): Promise<T> =>
-            request<T>(endpoint, { method: 'POST', body }),
+        post: <T>(
+            endpoint: string, 
+            body?: unknown,
+            pathParameters: Record<string, string> = {}): Promise<T> =>
+            request<T>(endpoint, { method: 'POST', body }, pathParameters),
 
-        put: <T>(endpoint: string, body?: unknown): Promise<T> =>
-            request<T>(endpoint, { method: 'PUT', body }),
+        put: <T>(
+            endpoint: string, 
+            body?: unknown,
+            pathParameters: Record<string, string> = {}): Promise<T> =>
+            request<T>(endpoint, { method: 'PUT', body }, pathParameters),
 
-        delete: <T>(endpoint: string): Promise<T> =>
+        delete: <T>(
+            endpoint: string,
+            pathParameters: Record<string, string> = {}): Promise<T> =>
             request<T>(endpoint, { method: 'DELETE' }),
     };
 };
 
+function resolveUrl(template: string, params: Record<string, string>): string {
+    return template.replace(/:([a-zA-Z_]+)/g, (_, key) => {
+        if (!params[key]) {
+            throw new Error(`Missing path parameter: ${key}`);
+        }
+        return params[key];
+    });
+}
 
-export const ApiClientUtils = {createApiClient}
+
+export const ApiClientUtils = {resolveUrl, createApiClient}
