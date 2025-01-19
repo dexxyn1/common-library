@@ -56,13 +56,15 @@ export const createApiClient = (basePath: string) => {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(`Request failed with status ${response.status}: ${JSON.stringify(errorData)}`);
+            return errorData as T;
         }
         
         // Handle no content for 202 or other no-body status codes
         if (response.status === 202 || response.status === 204 || !response.headers.get('Content-Type')) {
             return {} as T;
         }
+
+        // Return parsed JSON for non-void responses
         return await response.json() as T;
     };
 
