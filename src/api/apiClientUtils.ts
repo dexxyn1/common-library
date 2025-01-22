@@ -43,7 +43,7 @@ export const createApiClient = (basePath: string, debugMode: boolean=false) => {
         // Append query string to endpoint if queryParameters exist
         const url = queryString ? `${sanitizedBasePath}/${resolvedEndpoint}?${queryString}` : `${sanitizedBasePath}/${resolvedEndpoint}`;
 
-        logger.log(`Sending ${method} to ${url}`, debugMode)
+        logger.log(`Sending ${method} request to ${url}`, debugMode)
 
         if (method === 'GET' && body) {
             throw new Error('GET requests cannot have a body');
@@ -66,7 +66,12 @@ export const createApiClient = (basePath: string, debugMode: boolean=false) => {
         
         // Handle no content for 202 or other no-body status codes
         if (response.status === 202 || response.status === 204 || !response.headers.get('Content-Type')) {
-            return {} as T;
+            const body = await response.json().catch(() => null); // Safely attempt to parse body
+            // Check if body is not an empty object
+            if (body && Object.keys(body).length > 0) {
+                return body as T;
+            }
+            return {} as T; // Return empty object if no content or empty object
         }
 
         // Return parsed JSON for non-void responses
