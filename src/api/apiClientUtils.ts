@@ -1,3 +1,5 @@
+import { logger } from "../logger/logger";
+
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 export interface ApiOptions {
@@ -11,8 +13,8 @@ export interface ApiOptions {
  * Provides utility functions for making HTTP requests with query parameters,
  * custom HTTP methods, headers, and request bodies.
  */
-export const createApiClient = (basePath: string) => {
-    if (!basePath) {
+export const createApiClient = (basePath: string, debugMode: boolean=false) => {
+    if (basePath==undefined) {
         throw new Error('Base path is required');
     }
     const sanitizedBasePath = basePath.replace(/\/$/, '');
@@ -24,10 +26,10 @@ export const createApiClient = (basePath: string) => {
         pathParameters: unknown = {} // New parameter for path placeholders
     ): Promise<T> => {
         const { method = 'GET', headers, body } = options;
-
+        
         // Resolve the URL template with path parameters
         const resolvedEndpoint = pathParameters ? resolveUrl(endpoint, pathParameters) : endpoint;
-
+        
         // Construct query string from queryParameters
         const queryString = new URLSearchParams(
             Object.entries(queryParameters).reduce((acc, [key, value]) => {
@@ -40,6 +42,9 @@ export const createApiClient = (basePath: string) => {
 
         // Append query string to endpoint if queryParameters exist
         const url = queryString ? `${sanitizedBasePath}/${resolvedEndpoint}?${queryString}` : `${sanitizedBasePath}/${resolvedEndpoint}`;
+
+        logger.log(`Sending ${method} to ${url}`, debugMode)
+
         if (method === 'GET' && body) {
             throw new Error('GET requests cannot have a body');
         }
