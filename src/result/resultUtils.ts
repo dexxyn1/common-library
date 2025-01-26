@@ -32,7 +32,7 @@ export function errorToErrorResult(error: Error
     return { success: false, error: error };
 }
 
-export type ErrorName = "UnhandledError" | "Duplicate" | "NotFound" | "ApiError" | "ValidationError";
+export type ErrorName = "UnhandledError" | "BadRequest" | "NotFound" | "ValidationError" | "NotAuthorized";
 
 export function toErrorResult(name: ErrorName, message: string, details?: Record<string, unknown>, code?: string,  statusCode?: number
 ): ErrorResult {
