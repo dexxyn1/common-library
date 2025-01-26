@@ -49,15 +49,25 @@ export const createApiClient = (basePath: string, debugMode: boolean=false) => {
             throw new Error('GET requests cannot have a body');
         }
 
-        const requestBody = body ? JSON.stringify(body) : undefined;
+        // Prepare the request body and headers
+        let requestBody: BodyInit | undefined;
+        const finalHeaders = { ...headers };
+
+        if (body instanceof FormData) {
+            // If body is FormData, do not set Content-Type (browser will handle it)
+            requestBody = body;
+        } else if (body) {
+            // Assume JSON body
+            requestBody = JSON.stringify(body);
+            finalHeaders['Content-Type'] = 'application/json';
+        }
+
         const response = await fetch(url, {
             method,
-            headers: {
-                'Content-Type': 'application/json',
-                ...headers,
-            },
+            headers: finalHeaders,
             body: requestBody,
         });
+
 
         if (!response.ok) {
             const errorData = await response.json();
