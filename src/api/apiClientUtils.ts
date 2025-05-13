@@ -92,25 +92,33 @@ export const createApiClient = (basePath: string, debugMode: boolean=false) => {
         get: <T>(
             endpoint: string, 
             queryParameters: Record<string, string | number | boolean | null | undefined> = {},
-            pathParameters: unknown = {}): Promise<T> =>
-            request<T>(endpoint, { method: 'GET' }, queryParameters, pathParameters),
+            pathParameters: unknown = {},
+            headers?: Record<string, string>
+        ): Promise<T> =>
+            request<T>(endpoint, { method: 'GET', headers }, queryParameters, pathParameters),
 
         post: <T>(
             endpoint: string, 
             body?: unknown,
-            pathParameters: unknown = {}): Promise<T> =>
-            request<T>(endpoint, { method: 'POST', body }, {}, pathParameters),
+            pathParameters: unknown = {},
+            headers?: Record<string, string>
+        ): Promise<T> =>
+            request<T>(endpoint, { method: 'POST', body, headers }, {}, pathParameters),
 
         put: <T>(
             endpoint: string, 
             body?: unknown,
-            pathParameters: unknown = {}): Promise<T> =>
-            request<T>(endpoint, { method: 'PUT', body }, {}, pathParameters),
+            pathParameters: unknown = {},
+            headers?: Record<string, string>
+        ): Promise<T> =>
+            request<T>(endpoint, { method: 'PUT', body, headers }, {}, pathParameters),
 
         delete: <T>(
             endpoint: string,
-            pathParameters: unknown = {}): Promise<T> =>
-            request<T>(endpoint, { method: 'DELETE' }, {}, pathParameters),
+            pathParameters: unknown = {},
+            headers?: Record<string, string>
+        ): Promise<T> =>
+            request<T>(endpoint, { method: 'DELETE', headers }, {}, pathParameters),
     };
 };
 
