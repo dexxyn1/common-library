@@ -68,6 +68,11 @@ export const createApiClient = (basePath: string, debugMode: boolean=false) => {
             body: requestBody,
         });
 
+        logger.log(`Response status: ${response.status}`, debugMode)
+        logger.log(`Response headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`, debugMode)
+        logger.log(`Response URL: ${response.url}`, debugMode)
+        logger.log(`Response body: ${await response.text()}`, debugMode)
+
 
         if (!response.ok) {
             const errorData = await response.json();
