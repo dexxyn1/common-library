@@ -71,18 +71,17 @@ export const createApiClient = (basePath: string, debugMode: boolean=false) => {
         logger.log(`Response status: ${response.status}`, debugMode)
         logger.log(`Response headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`, debugMode)
         logger.log(`Response URL: ${response.url}`, debugMode)
-
+        const responseBody = await response.text();
+        logger.log(`Response body: ${responseBody}`, debugMode)
 
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData = JSON.parse(responseBody);
             return errorData as T;
         }
         
         // Handle no content for 202 or other no-body status codes
         if (response.status === 202 || response.status === 204 || !response.headers.get('Content-Type')) {
-            const body = await response.json().catch((e) => {
-                logger.log(`Response body: ${JSON.stringify(e)}`, debugMode)
-            }); // Safely attempt to parse body
+            const body = JSON.parse(responseBody || '{}');
             // Check if body is not an empty object
             if (body && Object.keys(body).length > 0) {
                 return body as T;
@@ -91,7 +90,7 @@ export const createApiClient = (basePath: string, debugMode: boolean=false) => {
         }
 
         // Return parsed JSON for non-void responses
-        return await response.json() as T;
+        return JSON.parse(responseBody);
     };
 
     return {
